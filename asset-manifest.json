@@ -1,0 +1,22 @@
+{
+  "files": {
+    "main.css": "/jovirtual/static/css/main.6dea0f05.chunk.css",
+    "main.js": "/jovirtual/static/js/main.28c061fd.chunk.js",
+    "main.js.map": "/jovirtual/static/js/main.28c061fd.chunk.js.map",
+    "runtime-main.js": "/jovirtual/static/js/runtime-main.705bb998.js",
+    "runtime-main.js.map": "/jovirtual/static/js/runtime-main.705bb998.js.map",
+    "static/js/2.c7bdbc99.chunk.js": "/jovirtual/static/js/2.c7bdbc99.chunk.js",
+    "static/js/2.c7bdbc99.chunk.js.map": "/jovirtual/static/js/2.c7bdbc99.chunk.js.map",
+    "static/js/3.eab4d081.chunk.js": "/jovirtual/static/js/3.eab4d081.chunk.js",
+    "static/js/3.eab4d081.chunk.js.map": "/jovirtual/static/js/3.eab4d081.chunk.js.map",
+    "index.html": "/jovirtual/index.html",
+    "static/css/main.6dea0f05.chunk.css.map": "/jovirtual/static/css/main.6dea0f05.chunk.css.map",
+    "static/js/2.c7bdbc99.chunk.js.LICENSE.txt": "/jovirtual/static/js/2.c7bdbc99.chunk.js.LICENSE.txt"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.705bb998.js",
+    "static/js/2.c7bdbc99.chunk.js",
+    "static/css/main.6dea0f05.chunk.css",
+    "static/js/main.28c061fd.chunk.js"
+  ]
+}
