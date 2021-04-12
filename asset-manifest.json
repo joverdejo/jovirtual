@@ -1,6 +1,6 @@
 {
   "files": {
-    "main.css": "/jovirtual/static/css/main.dc7a3750.chunk.css",
+    "main.css": "/jovirtual/static/css/main.c8a9a58c.chunk.css",
     "main.js": "/jovirtual/static/js/main.957bc3df.chunk.js",
     "main.js.map": "/jovirtual/static/js/main.957bc3df.chunk.js.map",
     "runtime-main.js": "/jovirtual/static/js/runtime-main.705bb998.js",
@@ -10,13 +10,13 @@
     "static/js/3.eab4d081.chunk.js": "/jovirtual/static/js/3.eab4d081.chunk.js",
     "static/js/3.eab4d081.chunk.js.map": "/jovirtual/static/js/3.eab4d081.chunk.js.map",
     "index.html": "/jovirtual/index.html",
-    "static/css/main.dc7a3750.chunk.css.map": "/jovirtual/static/css/main.dc7a3750.chunk.css.map",
+    "static/css/main.c8a9a58c.chunk.css.map": "/jovirtual/static/css/main.c8a9a58c.chunk.css.map",
     "static/js/2.9bfc19fa.chunk.js.LICENSE.txt": "/jovirtual/static/js/2.9bfc19fa.chunk.js.LICENSE.txt"
   },
   "entrypoints": [
     "static/js/runtime-main.705bb998.js",
     "static/js/2.9bfc19fa.chunk.js",
-    "static/css/main.dc7a3750.chunk.css",
+    "static/css/main.c8a9a58c.chunk.css",
     "static/js/main.957bc3df.chunk.js"
   ]
 }
