@@ -5,18 +5,13 @@ import TonePad from './Components/TonePad.js'
 
 function App() {
 
-  const handleTouchStart = () => {
-    console.log("hey")
-    document.getElementById('welcome').remove();
-  };
-
   return (
     
     <div className="App-body">
-      <div id="welcome" className="welcome" onTouchStart={handleTouchStart} onMouseDown={handleTouchStart} >
+      <div id="welcome" className="welcome">
         <h1>welcome to jovirtual</h1>
         <p>press and hold anywhere to create</p>
-        <b>(if on mobile, make sure ringer is on)</b>
+        <p>(if on mobile, make sure ringer is on)</p>
         </div>
         <TonePad />
     </div>

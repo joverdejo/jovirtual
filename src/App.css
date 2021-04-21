@@ -15,4 +15,5 @@
   align-items: center;
   overflow: hidden;
   justify-content: center;
+  user-select: none;
 }
