@@ -44,7 +44,7 @@ function TonePad() {
 
   function processSounds(data,uid){
     for (var other_uid in data){
-      console.log(other_uid);
+      // console.log(other_uid);
       if (other_uid == uid ) continue;
       s1.current.triggerAttackRelease((data[other_uid]["x"] + data[other_uid]["y"]) % 500, 0.9);
     }

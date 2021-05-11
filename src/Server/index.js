@@ -2,11 +2,15 @@ const db = {};
 const express = require('express');
 const app = express();
 var bodyParser = require("body-parser");
+
+// use the express-static middleware
+app.use(express.static("src"))
+
 app.use(bodyParser.urlencoded({extended:false}));
 app.use(bodyParser.json());
 
 app.post('/jovirtual/coords', respond)
-var port   = process.env.PORT || 8080;
+var port = process.env.PORT || 8080;
 
 function respond(req, res){
   var x = req.body["x"]
