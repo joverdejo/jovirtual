@@ -4,14 +4,26 @@ import { React, useRef } from 'react';
 import * as Tone from 'tone';
 
 function TonePad() {
-
-
-
-
   const pad = useRef(null);
   const loopBeat = useRef(null);
   const clientX = useRef(null);
   const clientY = useRef(null);
+  const clientXNorm = useRef(null);
+  const clientYNorm = useRef(null);
+  const clientYBucket = useRef(null);
+  const deltaY = useRef(null);
+  var beat = useRef(0);
+  var pitches = useRef(0);
+  const melody = useRef([100,200,150,250,400,400,300,100]);
+  const pitchDictM = {"0":[60],"1":[62],"2":[64],"3":[65],"4":[67],"5":[69],"6":[71],"7":[72],
+                      "8":[74],"9":[75],"A":[77],"B":[79],"C":[81],"D":[82],"E":[84],"F":[85]}
+  const pitchDictC = {"0":[53],"1":[54],"2":[55],"3":[56],"4":[57],"5":[58],"6":[59],"7":[60],
+                      "8":[61],"9":[62],"A":[63],"B":[64],"C":[65],"D":[66],"E":[67],"F":[68]}
+
+  // const distortion = new Tone.Distortion();
+  const filter = new Tone.Filter(1500, "lowpass");
+  const verb = new Tone.Reverb({decay:10, wet:0.3});
+  const delay = new Tone.FeedbackDelay("8n", 0.7);
   const s1 = useRef(new Tone.Sampler({
     volume: -10,
     urls: {
@@ -19,7 +31,7 @@ function TonePad() {
       A2: "A2.mp3",
     },
     baseUrl: "https://tonejs.github.io/audio/casio/",
-  }).toDestination());
+  }).chain(filter,verb,delay, Tone.Master));
 
   const s2 =  useRef(new Tone.Sampler({
     volume: -10,
@@ -38,7 +50,15 @@ function TonePad() {
     }
   }
 
-
+  function makeMelody(){
+    //assuming that n is a string, each element is between 0-9
+    melody.current = []  
+    pitches.current = "2369FE90";
+      console.log("making melody")
+      for (var i in pitches.current){
+        melody.current.push(Tone.Frequency(pitchDictC[pitches.current[i]],"midi").toFrequency())
+      }
+  }
   function sendData(){
     // fetch('/coords')
     //   .then(response => {
@@ -51,7 +71,7 @@ function TonePad() {
     //     }
     //   }).catch(err => console.error(err));
     var uid = 12345
-    fetch('/coords', {
+    fetch('/jovirtual/coords', {
       method: 'POST',
       body: JSON.stringify({
         x: clientX.current,
@@ -75,14 +95,26 @@ function TonePad() {
   }
 
   const song = (time) => {
+    makeMelody();
+    beat.current = (beat.current + 1) % 8
+    clientYNorm.current = 1-clientY.current/window.innerHeight
+    clientXNorm.current = clientX.current/window.innerWidth
+    var prev = clientYBucket.current
+    clientYBucket.current = Math.abs((clientYBucket.current + deltaY.current)/150) * 0.9 > 1 ? 
+    1 : Math.abs((clientYBucket.current + deltaY.current)/150) * 0.9;
     sendData()
-    if (clientX.current == null) {
-      clientX.current = 440
+    clientYBucket.current = 0.95*prev + clientYBucket.current*(1-0.95)
+    console.log(clientYBucket.current)
+    //s1.current.set({volume:clientYBucket.current})
+    delay.set({wet:(delay.wet.value+clientYBucket.current)/2})
+    filter.set({frequency: (clientYNorm.current**2)*15000+400});
+    var rhythm = (parseInt(clientXNorm.current*256)).toString(2);
+    while (rhythm.length < 8) rhythm = "0"+rhythm
+    console.log(rhythm);
+    if (rhythm[beat.current] === "1"){ 
+      s1.current.triggerAttackRelease(melody.current[beat.current], 0.9);
     }
-    if (clientY.current == null) {
-      clientY.current = 440
-    }
-    s1.current.triggerAttackRelease((clientX.current + clientY.current) % 500, 0.9);
+
   };
 
 
@@ -108,7 +140,7 @@ function TonePad() {
     pad.current.style.boxShadow = "inset 0 0 30px #000000"
 
     if (loopBeat.current == null) {
-      loopBeat.current = new Tone.Loop(song, '8n');
+      loopBeat.current = new Tone.Loop(song, '16n');
     }
     loopBeat.current.start(0)
     // osc.connect(filterLow);
@@ -130,22 +162,19 @@ function TonePad() {
 
   //---------Handle TOUCH MOVE
   const handleTouchMove = (e) => {
+    
     if (e.touches != null) {
+      deltaY.current = Math.abs(e.touches[0].clientY)-clientY.current 
       clientY.current = Math.abs(e.touches[0].clientY);
       clientX.current = Math.abs(e.touches[0].clientX);
     }
     else {
+      deltaY.current = Math.abs(e.clientY)-clientY.current 
       clientY.current = parseInt(Math.abs(e.clientY));
       clientX.current = parseInt(Math.abs(e.clientX));
     }
-    if (clientX.current == null) {
-      clientX.current = 440
-    }
-    if (clientY.current == null) {
-      clientY.current = 440
-    }
     //mod each 3 digits of id here
-
+    
     var a = zigzag(clientX.current, 255)
     var b = zigzag(clientY.current, 255)
     // var c = zigzag((clientX.current+clientY.current),255)
