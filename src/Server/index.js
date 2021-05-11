@@ -3,9 +3,6 @@ const express = require('express');
 const app = express();
 var bodyParser = require("body-parser");
 
-// use the express-static middleware
-app.use(express.static("src"))
-
 app.use(bodyParser.urlencoded({extended:false}));
 app.use(bodyParser.json());
 
