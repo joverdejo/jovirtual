@@ -6,6 +6,7 @@ app.use(bodyParser.urlencoded({extended:false}));
 app.use(bodyParser.json());
 
 app.post('/jovirtual/coords', respond)
+var port   = process.env.PORT || 8080;
 
 function respond(req, res){
   var x = req.body["x"]
@@ -15,4 +16,5 @@ function respond(req, res){
   res.status(200).send(db)
 }
 
-app.listen(8080, "0.0.0.0")
+app.listen(port, "0.0.0.0")
+
