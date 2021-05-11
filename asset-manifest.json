@@ -1,8 +1,8 @@
 {
   "files": {
     "main.css": "/jovirtual/static/css/main.5cde4364.chunk.css",
-    "main.js": "/jovirtual/static/js/main.70e564f8.chunk.js",
-    "main.js.map": "/jovirtual/static/js/main.70e564f8.chunk.js.map",
+    "main.js": "/jovirtual/static/js/main.e5cff4a8.chunk.js",
+    "main.js.map": "/jovirtual/static/js/main.e5cff4a8.chunk.js.map",
     "runtime-main.js": "/jovirtual/static/js/runtime-main.9cbb41f2.js",
     "runtime-main.js.map": "/jovirtual/static/js/runtime-main.9cbb41f2.js.map",
     "static/js/2.f73098f8.chunk.js": "/jovirtual/static/js/2.f73098f8.chunk.js",
@@ -17,6 +17,6 @@
     "static/js/runtime-main.9cbb41f2.js",
     "static/js/2.f73098f8.chunk.js",
     "static/css/main.5cde4364.chunk.css",
-    "static/js/main.70e564f8.chunk.js"
+    "static/js/main.e5cff4a8.chunk.js"
   ]
 }
