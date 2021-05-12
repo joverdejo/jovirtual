@@ -2,6 +2,8 @@
 import '../Styles/TonepadStyle.css'
 import { React, useRef } from 'react';
 import * as Tone from 'tone';
+import {v4 as uuidv4} from 'uuid';
+
 
 function TonePad() {
   const pad = useRef(null);
@@ -15,7 +17,7 @@ function TonePad() {
   let id = uuidv4();
   var beat = useRef(0);
   var pitches = useRef("ABC");
-  const melody = useRef([100,200,150,250,400,400,300,100]);
+  const melody = useRef([]);
   const pitchDictM = {"0":[60],"1":[62],"2":[64],"3":[65],"4":[67],"5":[69],"6":[71],"7":[72],
                       "8":[74],"9":[75],"A":[77],"B":[79],"C":[81],"D":[82],"E":[84],"F":[85]}
   const pitchDictC = {"0":[53],"1":[54],"2":[55],"3":[56],"4":[57],"5":[58],"6":[59],"7":[60],
