@@ -79,7 +79,7 @@ function TonePad() {
         userId: clientY.current
       }),
       headers: {
-        'mode': 'no-cors',
+        mode: 'no-cors',
         'Content-type': 'application/json; charset=UTF-8'
       }
     }).then(function (response) {
