@@ -12,6 +12,7 @@ function TonePad() {
   const clientYNorm = useRef(null);
   const clientYBucket = useRef(null);
   const deltaY = useRef(null);
+  let id = uuidv4();
   var beat = useRef(0);
   var pitches = useRef("ABC");
   const melody = useRef([100,200,150,250,400,400,300,100]);
@@ -75,13 +76,12 @@ function TonePad() {
   }
   
   function sendData(){
-    var uid = 12345
     fetch('https://jovirtual-server.herokuapp.com/jovirtual/coords', {
       method: 'POST',
       body: JSON.stringify({
         x: clientX.current,
         y: clientY.current,
-        userId: clientY.current
+        userId: id
       }),
       headers: {
         'Content-type': 'application/json; charset=UTF-8'
