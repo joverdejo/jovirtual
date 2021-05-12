@@ -71,7 +71,7 @@ function TonePad() {
     //     }
     //   }).catch(err => console.error(err));
     var uid = 12345
-    fetch('/jovirtual/coords', {
+    fetch('https://jovirtual-server.herokuapp.com/jovirtual/coords', {
       method: 'POST',
       body: JSON.stringify({
         x: clientX.current,
@@ -79,6 +79,7 @@ function TonePad() {
         userId: clientY.current
       }),
       headers: {
+        'mode': 'no-cors',
         'Content-type': 'application/json; charset=UTF-8'
       }
     }).then(function (response) {
