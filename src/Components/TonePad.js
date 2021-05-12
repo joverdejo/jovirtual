@@ -13,7 +13,7 @@ function TonePad() {
   const clientYBucket = useRef(null);
   const deltaY = useRef(null);
   var beat = useRef(0);
-  var pitches = useRef(0);
+  var pitches = useRef("ABC");
   const melody = useRef([100,200,150,250,400,400,300,100]);
   const pitchDictM = {"0":[60],"1":[62],"2":[64],"3":[65],"4":[67],"5":[69],"6":[71],"7":[72],
                       "8":[74],"9":[75],"A":[77],"B":[79],"C":[81],"D":[82],"E":[84],"F":[85]}
@@ -53,23 +53,28 @@ function TonePad() {
   function makeMelody(){
     //assuming that n is a string, each element is between 0-9
     melody.current = []  
-    pitches.current = "2369FE90";
+    getMelody();
       console.log("making melody")
       for (var i in pitches.current){
         melody.current.push(Tone.Frequency(pitchDictC[pitches.current[i]],"midi").toFrequency())
       }
   }
+
+  function getMelody(){
+    fetch('https://jovirtual-server.herokuapp.com/jovirtual/card')
+      .then(response => {
+        if (response.ok) {
+          return response.json();
+        }
+      }).then(data => {
+        if (data) {
+          pitches.current = data
+          console.log(data);
+        }
+      }).catch(err => console.error(err));
+  }
+  
   function sendData(){
-    // fetch('/coords')
-    //   .then(response => {
-    //     if (response.ok) {
-    //       return response.json();
-    //     }
-    //   }).then(data => {
-    //     if (data) {
-    //       console.log(data);
-    //     }
-    //   }).catch(err => console.error(err));
     var uid = 12345
     fetch('https://jovirtual-server.herokuapp.com/jovirtual/coords', {
       method: 'POST',
@@ -95,16 +100,17 @@ function TonePad() {
   }
 
   const song = (time) => {
-    makeMelody();
+    if (beat.current == 0){
+      makeMelody();
+    }
     beat.current = (beat.current + 1) % 8
     clientYNorm.current = 1-clientY.current/window.innerHeight
     clientXNorm.current = clientX.current/window.innerWidth
     var prev = clientYBucket.current
     clientYBucket.current = Math.abs((clientYBucket.current + deltaY.current)/150) * 0.9 > 1 ? 
     1 : Math.abs((clientYBucket.current + deltaY.current)/150) * 0.9;
-    sendData()
-    clientYBucket.current = 0.95*prev + clientYBucket.current*(1-0.95)
-    console.log(clientYBucket.current)
+    sendData();
+    clientYBucket.current = 0.95*prev + clientYBucket.current*(1-0.95);
     //s1.current.set({volume:clientYBucket.current})
     delay.set({wet:(delay.wet.value+clientYBucket.current)/2})
     filter.set({frequency: (clientYNorm.current**2)*15000+400});
