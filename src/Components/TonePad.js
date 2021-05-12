@@ -94,7 +94,7 @@ function TonePad() {
       }
       return Promise.reject(response);
     }).then(function (data) {
-      processSounds(data,uid);
+      processSounds(data,id);
       console.log(data);
     }).catch(function (error) {
       console.warn('Something went wrong.', error);
