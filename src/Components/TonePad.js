@@ -4,6 +4,7 @@ import { React, useRef, useEffect } from 'react';
 import * as Tone from 'tone';
 import {getPitches,getOtherSounds,sendData} from './client.js'
 import fx from 'fireworks';
+import * as samplers from './samplers';
 var seedrandom = require('seedrandom');
 
 function TonePad() {
@@ -26,40 +27,14 @@ function TonePad() {
   const pitchDictC = {"0":[53],"1":[54],"2":[55],"3":[56],"4":[57],"5":[58],"6":[59],"7":[60],
                       "8":[61],"9":[62],"A":[63],"B":[64],"C":[65],"D":[66],"E":[67],"F":[68]}
 
-  // const distortion = new Tone.Distortion();
-  const filter2 = new Tone.Filter(1500, "lowpass");
-  const verb2 = new Tone.Reverb({decay:10, wet:0.3});
-  const delay2 = new Tone.FeedbackDelay("8n", 0.7);
-  const s2 =  new Tone.Sampler({
-    volume: -10,
-    urls: {
-      A1: "A1.mp3",
-      A2: "A2.mp3",
-    },
-    baseUrl: "https://tonejs.github.io/audio/salamander/",
-  }).chain(filter2,verb2,delay2, Tone.Master);
-
-  const filter1 = new Tone.Filter(1500, "lowpass");
-  const verb1 = new Tone.Reverb({decay:10, wet:0.3});
-  const delay1 = new Tone.FeedbackDelay("8n", 0.7);
-  const s1 = new Tone.Sampler({
-    volume: -10,
-    urls: {
-      A1: "A1.mp3",
-      A2: "A2.mp3",
-    },
-    baseUrl: "https://tonejs.github.io/audio/casio/",
-  }).chain(filter1,verb1,delay1, Tone.Master);
-
-
   //temporary values if ID not set
-  var filter = filter1;
-  var verb = verb1;
-  var delay = delay1;
-  var sampler =  useRef(s1);
+  var filter = samplers.filter1;
+  var verb = samplers.verb1;
+  var delay = samplers.delay1;
+  var sampler =  useRef(samplers.s1);
+  
+  
   var [c1,c2,c3] = [0,0,0]
-  var numberOfSamplers = 2
-
   //runs at start
   useEffect(()=>{
     const urlParams = new URLSearchParams(window.location.search);
@@ -79,18 +54,10 @@ function TonePad() {
 
   function selectSampler(mitID){
     seedrandom(mitID.toString(), { global: true });
-    var choose = Math.round(Math.random() * numberOfSamplers)
+    var choose = Math.round(Math.random() * samplers.samplersList.length-1)
     //resets things back to normal for user
     seedrandom(id.current.toString(), { global: true });
-    if (choose == 1){
-      return [filter1,verb1,delay1,s1]
-    }
-    else if (choose == 2){
-      return [filter2,verb2,delay2,s2]
-    }
-    else{
-      return [filter1,verb1,delay1,s1]
-    }
+    return samplers.samplersList[choose]
   }
 
   function generateOtherSounds(data,uid){
