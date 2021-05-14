@@ -1,5 +1,5 @@
 var db = {};
-var card = "12345";
+var card = {"card":"12345"};
 const express = require('express');
 const app = express();
 var bodyParser = require("body-parser");
@@ -55,9 +55,9 @@ function cleanDB(req,res){
 }
 
 function postCard(req, res){
-  card = req.body["cardId"]
-  card = card.replace(/[^0-9a-f]/gi, '').toUpperCase()
-  res.status(200).send("melody changed to: " + card)
+  cardid = req.body["cardId"]
+  card["card"] = cardid.replace(/[^0-9a-f]/gi, '').toUpperCase()
+  res.status(200).send("melody changed to: " + card["card"])
   return "Done!"
 }
 

@@ -3,7 +3,8 @@ var sounds;
 var pitches = "";
 export function sendData(x,y,id,mouse,d,f){
     //switch to http://localhost:8080/jovirtual/coords when debugging
-    fetch('https://jovirtual-server.herokuapp.com/jovirtual/coords', {
+    // https://jovirtual-server.herokuapp.com/jovirtual/coords in production
+    fetch('http://localhost:8080/jovirtual/coords', {
       method: 'POST',
       body: JSON.stringify({
         x: x,
@@ -30,7 +31,7 @@ export function sendData(x,y,id,mouse,d,f){
   }
 
   export function getOtherSounds(){
-    fetch('https://jovirtual-server.herokuapp.com/jovirtual/coords')
+    fetch('http://localhost:8080/jovirtual/coords')
       .then(response => {
         if (response.ok) {
           return response.json();
@@ -45,7 +46,7 @@ export function sendData(x,y,id,mouse,d,f){
   }
   
   export function getPitches(){  
-    fetch('https://jovirtual-server.herokuapp.com/jovirtual/card')
+    fetch('http://localhost:8080/jovirtual/card')
       .then(response => {
         if (response.ok) {
             return response.json();
@@ -55,6 +56,6 @@ export function sendData(x,y,id,mouse,d,f){
             return data;
         }
       }).catch(err => console.error(err));
-      return pitches
+      return pitches;
   }
   

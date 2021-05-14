@@ -18,7 +18,7 @@ function TonePad() {
   const deltaY = useRef(null);
   let id = useRef(123456789);
   var beat = useRef(0);
-  var pitches = useRef("ACFABAC");
+  var pitches = useRef({"card":"ACFABAC"});
   var mouseDown = useRef(false);
   const melody = useRef([100,200,100,150,300,250]);
   const pitchDictM = {"0":[60],"1":[62],"2":[64],"3":[65],"4":[67],"5":[69],"6":[71],"7":[72],
@@ -57,7 +57,7 @@ function TonePad() {
   var verb = verb1;
   var delay = delay1;
   var sampler =  useRef(s1);
-
+  var [c1,c2,c3] = [0,0,0]
   var numberOfSamplers = 2
 
   //runs at start
@@ -71,6 +71,10 @@ function TonePad() {
         }
         [filter,verb,delay,sampler.current] = selectSampler(id.current)
     }
+      seedrandom(id.current.toString(), { global: true });
+      c1 = "#" + Math.floor(Math.random()*16777215).toString(16);
+      c2 = "#" + Math.floor(Math.random()*16777215).toString(16);
+      c3 = "#" + Math.floor(Math.random()*16777215).toString(16);
   }, []) 
 
   function selectSampler(mitID){
@@ -108,8 +112,8 @@ function TonePad() {
       otherSamplers[other_uid]["filter"].set({frequency: data[other_uid]["f"]});
       otherSamplers[other_uid]["sampler"].triggerAttackRelease(melody.current[beat.current%melody.current.length], 0.9);
       fx({
-        x: data[other_uid]["x"],
-        y: data[other_uid]["y"],
+        x: data[other_uid]["x"]*window.innerWidth,
+        y: data[other_uid]["y"]*window.innerHeight,
         colors: [otherSamplers[other_uid]["c1"],otherSamplers[other_uid]["c2"],otherSamplers[other_uid]["c3"]]
       })
     }
@@ -118,10 +122,16 @@ function TonePad() {
 
   function makeMelody(){
     //assuming that n is a string, each element is between 0-9  
-    pitches.current = getPitches();
-    if (pitches.current.length > 0) melody.current = [];
-    for (var i in pitches.current){
-      melody.current.push(Tone.Frequency(pitchDictC[pitches.current[i]],"midi").toFrequency())
+    pitches.current["card"] = getPitches()["card"];
+    var newPitches = pitches.current["card"]
+    if (newPitches === undefined){
+      newPitches = "12345"
+    }
+    if (newPitches.length > 0) {
+      melody.current = []
+    };
+    for (var i in newPitches.split("")){
+      melody.current.push(Tone.Frequency(pitchDictC[newPitches[i]],"midi").toFrequency())
     }
   }
   
@@ -147,10 +157,15 @@ function TonePad() {
     while (rhythm.length < 8) rhythm = "0"+rhythm
     var flag = mouseDown.current
     if (rhythm[beat.current] === "0") mouseDown.current = false 
-    sendData(clientX.current, clientY.current, id.current, mouseDown.current, d, f);
+    sendData(clientX.current/window.innerWidth, clientY.current/window.innerHeight, id.current, mouseDown.current, d, f);
     mouseDown.current = flag
     if (rhythm[beat.current] === "1" && mouseDown.current){ 
       sampler.current.triggerAttackRelease(melody.current[beat.current%melody.current.length], 0.9);
+      fx({
+        x: clientX.current,
+        y: clientY.current,
+        colors: [c1,c2,c3]
+      })
     }
     var d = getOtherSounds();
     generateOtherSounds(d,id.current);
@@ -225,7 +240,7 @@ function TonePad() {
   const handleTouchEnd = () => {
     mouseDown.current = false
     var [d,f] = createSound();
-    sendData(clientX.current, clientY.current, id.current, mouseDown.current, d,f);
+    sendData(clientX.current/window.innerWidth, clientY.current/window.innerHeight, id.current, mouseDown.current, d,f);
     pad.current.style.boxShadow = "inset 0 0 20px #000000"
   };
 
