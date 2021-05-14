@@ -54,7 +54,7 @@ function TonePad() {
 
   function selectSampler(mitID){
     seedrandom(mitID.toString(), { global: true });
-    var choose = Math.round(Math.random() * samplers.samplersList.length-1)
+    var choose = Math.round(Math.abs((Math.random() * (samplers.samplersList.length-1))))
     //resets things back to normal for user
     seedrandom(id.current.toString(), { global: true });
     return samplers.samplersList[choose]
