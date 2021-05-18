@@ -14,6 +14,7 @@ function TonePad() {
   const clientX = useRef(null);
   const clientY = useRef(null);
   const clientXNorm = useRef(null);
+  const touchRegistered = useRef(null);
   const clientYNorm = useRef(null);
   const clientYBucket = useRef(null);
   const deltaY = useRef(null);
@@ -22,15 +23,19 @@ function TonePad() {
   var pitches = useRef({"card":"ACFABAC"});
   var mouseDown = useRef(false);
   const melody = useRef([100,200,100,150,300,250]);
-  const pitchDictM = {"0":[60],"1":[62],"2":[64],"3":[65],"4":[67],"5":[69],"6":[71],"7":[72],
-                      "8":[74],"9":[75],"A":[77],"B":[79],"C":[81],"D":[82],"E":[84],"F":[85]}
+  const pitchDictM = {"0":[60-12],"1":[62-12],"2":[64-12],"3":[65-12],"4":[67-12],"5":[69-12],"6":[71-12],"7":[72-12],
+                      "8":[74-12],"9":[75-12],"A":[77-12],"B":[79-12],"C":[81-12],"D":[82-12],"E":[84-12],"F":[85-12]}
   const pitchDictC = {"0":[53],"1":[54],"2":[55],"3":[56],"4":[57],"5":[58],"6":[59],"7":[60],
                       "8":[61],"9":[62],"A":[63],"B":[64],"C":[65],"D":[66],"E":[67],"F":[68]}
+
+  var chordArrayUp = [0,1,2,4]
+  var chordArrayDown = [4,2,1,0]
 
   //temporary values if ID not set
   var filter = samplers.filter1;
   var verb = samplers.verb1;
   var delay = samplers.delay1;
+  var decay = 0.5
   var sampler =  useRef(samplers.s1);
   
   
@@ -44,7 +49,7 @@ function TonePad() {
       if (document.getElementById('login-wrapper')){
           document.getElementById('login-wrapper').remove();
         }
-        [filter,verb,delay,sampler.current] = selectSampler(id.current)
+        [filter,verb,delay,sampler.current, decay] = selectSampler(id.current)
     }
       seedrandom(id.current.toString(), { global: true });
       c1 = "#" + Math.floor(Math.random()*16777215).toString(16);
@@ -64,12 +69,13 @@ function TonePad() {
     for (var other_uid in data){
       if (other_uid === uid || !data[other_uid]["mouseDown"]) continue;
       if (!(other_uid in otherSamplers)){
-      var [otherFilter,otherVerb,otherDelay,otherSampler] = selectSampler(other_uid);
+      var [otherFilter,otherVerb,otherDelay,otherSampler,otherDecay] = selectSampler(other_uid);
       otherSamplers[other_uid] = {}
       otherSamplers[other_uid]["filter"] = otherFilter
       otherSamplers[other_uid]["verb"] = otherVerb
       otherSamplers[other_uid]["delay"] = otherDelay
       otherSamplers[other_uid]["sampler"] = otherSampler
+      otherSamplers[other_uid]["decay"] = otherDecay
       seedrandom(other_uid.toString(), { global: true });
       otherSamplers[other_uid]["c1"] = "#" + Math.floor(Math.random()*16777215).toString(16);
       otherSamplers[other_uid]["c2"] = "#" + Math.floor(Math.random()*16777215).toString(16);
@@ -77,18 +83,23 @@ function TonePad() {
       }
       otherSamplers[other_uid]["delay"].set({wet: data[other_uid]["d"]});
       otherSamplers[other_uid]["filter"].set({frequency: data[other_uid]["f"]});
-      otherSamplers[other_uid]["sampler"].triggerAttackRelease(melody.current[beat.current%melody.current.length], 0.9);
+      var velocity = Math.sqrt(data[other_uid]["y"])
+      var decay = otherSamplers[other_uid]["decay"]
+      otherSamplers[other_uid]["sampler"].triggerAttackRelease(melody.current[beat.current%melody.current.length], decay, Tone.now(),velocity);
       fx({
         x: data[other_uid]["x"]*window.innerWidth,
         y: data[other_uid]["y"]*window.innerHeight,
         colors: [otherSamplers[other_uid]["c1"],otherSamplers[other_uid]["c2"],otherSamplers[other_uid]["c3"]]
       })
+      
+      
     }
     
   }
 
   function makeMelody(){
     //assuming that n is a string, each element is between 0-9  
+
     pitches.current["card"] = getPitches()["card"];
     var newPitches = pitches.current["card"]
     if (newPitches === undefined){
@@ -98,7 +109,17 @@ function TonePad() {
       melody.current = []
     };
     for (var i in newPitches.split("")){
-      melody.current.push(Tone.Frequency(pitchDictC[newPitches[i]],"midi").toFrequency())
+      var currentChord = chordArrayUp
+      if (parseInt(newPitches[i], 16) > parseInt(newPitches[(i+1)%newPitches.length], 16)){
+          currentChord = chordArrayDown
+      }
+      for (var c in currentChord){
+      var note = currentChord[c]
+      var index = (parseInt(newPitches[i], 16) + parseInt(note, 16));
+      var shift = index > 15 ? 7 : 0
+      index = (index%15).toString(16).toUpperCase()
+      melody.current.push(Tone.Frequency(parseInt(pitchDictM[index])+parseInt(shift),"midi").toFrequency())
+      }
     }
   }
   
@@ -118,21 +139,48 @@ function TonePad() {
     if (beat.current === 0){
       makeMelody();
     }
-    beat.current = (beat.current + 1) % 8
-    var [d,f] = createSound();
-    var rhythm = (parseInt(clientXNorm.current*256)).toString(2);
-    while (rhythm.length < 8) rhythm = "0"+rhythm
-    var flag = mouseDown.current
-    if (rhythm[beat.current] === "0") mouseDown.current = false 
-    sendData(clientX.current/window.innerWidth, clientY.current/window.innerHeight, id.current, mouseDown.current, d, f);
-    mouseDown.current = flag
-    if (rhythm[beat.current] === "1" && mouseDown.current){ 
-      sampler.current.triggerAttackRelease(melody.current[beat.current%melody.current.length], 0.9);
+    if (touchRegistered.current){
+      sampler.current.triggerAttackRelease(melody.current[beat.current%melody.current.length], decay, time, 0.4);
       fx({
         x: clientX.current,
         y: clientY.current,
         colors: [c1,c2,c3]
       })
+      touchRegistered.current = false
+    }
+    beat.current = (beat.current + 1) % 32
+    var [d,f] = createSound();
+    
+    var rhythm = (parseInt(clientXNorm.current*16)).toString(2).split("");
+    if (decay > 1){
+      rhythm.map(x => x+"000");
+      rhythm += rhythm
+    }
+    else if (decay > 0.5){
+      rhythm.map(x => x+"0");
+      for (var i = 0; i<3; i++){
+        rhythm += rhythm
+        }
+    }
+    else{
+      for (var i = 0; i<7; i++){
+        rhythm += rhythm
+        }
+    }
+    
+    while (rhythm.length < 8) rhythm = "0"+rhythm
+    var flag = mouseDown.current
+    if (rhythm[beat.current] === "0") mouseDown.current = false 
+    sendData(clientX.current/window.innerWidth, clientY.current/window.innerHeight, id.current, mouseDown.current, d, f);
+    mouseDown.current = flag
+    var velocity = Math.sqrt(clientYNorm.current)
+    if (rhythm[beat.current] === "1" && mouseDown.current){ 
+        sampler.current.triggerAttackRelease(melody.current[beat.current%melody.current.length], decay, time, velocity);
+        fx({
+          x: clientX.current,
+          y: clientY.current,
+          colors: [c1,c2,c3]
+        })
     }
     var d = getOtherSounds();
     generateOtherSounds(d,id.current);
@@ -142,6 +190,7 @@ function TonePad() {
 
   //---------Handle TOUCH START
   const handleTouchStart = (e) => {
+    touchRegistered.current = true
     mouseDown.current = true
     if (e.touches != null) {
       clientY.current = Math.abs(e.touches[0].clientY);
@@ -151,25 +200,21 @@ function TonePad() {
       clientY.current = Math.abs(e.clientY);
       clientX.current = Math.abs(e.clientX);
     }
-    if (clientX.current == null) {
+    if (clientX.current === null) {
       clientX.current = 440
     }
-    if (clientY.current == null) {
+    if (clientY.current === null) {
       clientY.current = 440
     }
-    // pointer.current.style.visibility = "visible"
-    // pointer.current.style.transform = `translate(${clientX}px, ${clientY }px)`
+
 
     pad.current.style.boxShadow = "inset 0 0 30px #000000"
 
-    if (loopBeat.current == null) {
-      loopBeat.current = new Tone.Loop(song, '16n');
+    if (loopBeat.current === null) {
+      loopBeat.current = new Tone.Loop(song, '8n');
     }
     loopBeat.current.start(0)
-    // osc.connect(filterLow);
-    // osc.start();
-    // osc.frequency.value = clientY;
-    // filterLow.frequency.value = clientX + 300;
+
 
     Tone.Transport.bpm.value = 120
     Tone.start()
@@ -195,9 +240,9 @@ function TonePad() {
     var a = (1-clientY.current/window.innerHeight)*255
     var b = (clientX.current/window.innerWidth)*255
     //changes welcome message color if not hardcoded in app.css
-    // var c = (Math.min(a+90,255) == 255) ? a-90 : a+90 
-    // var d = (Math.min(b+90,255) == 255) ? b-90 : b+90 
-    // var f = (Math.min(a+90,255) == 255) ? 10 : 190
+    // var c = (Math.min(a+90,255) === 255) ? a-90 : a+90 
+    // var d = (Math.min(b+90,255) === 255) ? b-90 : b+90 
+    // var f = (Math.min(a+90,255) === 255) ? 10 : 190
     // document.getElementById('welcome').style.color = `rgb(${c}, ${d}, ${f})`;;
     seedrandom(id.current.toString(), { global: true });
     document.body.style.backgroundColor = `rgb(${a}, ${b}, ${Math.random()*200})`;
