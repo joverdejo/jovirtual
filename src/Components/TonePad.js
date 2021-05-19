@@ -163,10 +163,10 @@ function TonePad() {
       rhythm += rhythm
     }
     else if (decay > 0.5){
+      rhythm = ""
       for (var r in oldRhythm){
         rhythm += oldRhythm[r] + "0"
       }
-
       for (var i = 0; i<3; i++){
         rhythm += rhythm
         }
