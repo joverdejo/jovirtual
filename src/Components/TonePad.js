@@ -151,7 +151,9 @@ function TonePad() {
     beat.current = (beat.current + 1) % 32
     var [d,f] = createSound();
     
-    var rhythm = (parseInt(clientXNorm.current*16)).toString(2).split("");
+    var rhythm = (parseInt(clientXNorm.current*16)).toString(2);
+    while (rhythm.length < 4) rhythm = "0"+rhythm
+    console.log(rhythm)
     if (decay > 1){
       rhythm.map(x => x+"000");
       rhythm += rhythm
@@ -167,8 +169,8 @@ function TonePad() {
         rhythm += rhythm
         }
     }
+    console.log(rhythm.length)
     
-    while (rhythm.length < 8) rhythm = "0"+rhythm
     var flag = mouseDown.current
     if (rhythm[beat.current] === "0") mouseDown.current = false 
     if (touchRegistered.current) mouseDown.current = true 
