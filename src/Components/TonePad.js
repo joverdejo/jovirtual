@@ -247,15 +247,15 @@ function TonePad() {
       clientX.current = parseInt(Math.abs(e.clientX));
     }
     //mod each 3 digits of id here
-    var a = (1-clientY.current/window.innerHeight)*255
-    var b = (clientX.current/window.innerWidth)*255
+    var a = (1-clientY.current/window.innerHeight)*90
+    var b = (clientX.current/window.innerWidth)*90
     //changes welcome message color if not hardcoded in app.css
     // var c = (Math.min(a+90,255) === 255) ? a-90 : a+90 
     // var d = (Math.min(b+90,255) === 255) ? b-90 : b+90 
     // var f = (Math.min(a+90,255) === 255) ? 10 : 190
     // document.getElementById('welcome').style.color = `rgb(${c}, ${d}, ${f})`;;
     seedrandom(id.current.toString(), { global: true });
-    document.body.style.backgroundColor = `rgb(${a}, ${b}, ${Math.random()*200})`;
+    document.body.style.backgroundColor = `rgb(${a}, ${b}, ${Math.random()*91})`;
   };
 
   //---------Handle TOUCH END
