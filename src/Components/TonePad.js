@@ -171,6 +171,7 @@ function TonePad() {
     while (rhythm.length < 8) rhythm = "0"+rhythm
     var flag = mouseDown.current
     if (rhythm[beat.current] === "0") mouseDown.current = false 
+    if (touchRegistered.current) mouseDown.current = true 
     sendData(clientX.current/window.innerWidth, clientY.current/window.innerHeight, id.current, mouseDown.current, d, f);
     mouseDown.current = flag
     var velocity = Math.sqrt(clientYNorm.current)
