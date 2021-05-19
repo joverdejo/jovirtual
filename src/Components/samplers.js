@@ -33,7 +33,7 @@ export const verb3 = new Tone.Reverb({decay:20, wet:0.95});
 export const delay3 = new Tone.FeedbackDelay("2n", 0.7);
 export const decay3 = 1.5;
 export const s3 =  new Tone.Sampler({
-volume: -15,
+volume: -20,
 urls: {
     A2: "A1.mp3",
     A3: "A2.mp3",

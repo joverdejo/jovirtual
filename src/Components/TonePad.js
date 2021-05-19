@@ -226,7 +226,7 @@ function TonePad() {
     loopBeat.current.start(0)
 
 
-    Tone.Transport.bpm.value = 120
+    Tone.Transport.bpm.value = 130
     Tone.start()
     Tone.Transport.start()
 
