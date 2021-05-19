@@ -154,12 +154,19 @@ function TonePad() {
     var rhythm = (parseInt(clientXNorm.current*16)).toString(2);
     while (rhythm.length < 4) rhythm = "0"+rhythm
     console.log(rhythm)
+    var oldRhythm = rhythm
     if (decay > 1){
-      rhythm.map(x => x+"000");
+      rhythm = ""
+      for (var r in oldRhythm){
+        rhythm += oldRhythm[r] + "000"
+      }
       rhythm += rhythm
     }
     else if (decay > 0.5){
-      rhythm.map(x => x+"0");
+      for (var r in oldRhythm){
+        rhythm += oldRhythm[r] + "0"
+      }
+
       for (var i = 0; i<3; i++){
         rhythm += rhythm
         }
