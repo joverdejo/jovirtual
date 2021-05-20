@@ -2,12 +2,17 @@
 import '../Styles/TonepadStyle.css'
 import { React, useRef, useEffect } from 'react';
 import * as Tone from 'tone';
-import {getPitches,getOtherSounds,sendData} from './client.js'
+import {getPitches,getOtherSounds,sendData, sendDataSocket} from './client.js'
 import fx from 'fireworks';
 import * as samplers from './samplers';
+import { io } from "socket.io-client";
+
+//change to http://localhost:8080 on debug
+//use https://jovirtual-server.herokuapp.com in production
+var socket = io("https://jovirtual-server.herokuapp.com");
 var seedrandom = require('seedrandom');
 
-function TonePad() {
+function TonePad() {  
   var otherSamplers = {}
   const pad = useRef(null);
   const loopBeat = useRef(null);
@@ -42,6 +47,15 @@ function TonePad() {
   var [c1,c2,c3] = [0,0,0]
   //runs at start
   useEffect(()=>{
+    socket.on('db', function(data) {
+      console.log(data);
+      generateOtherSounds(data,id.current);
+    });
+    socket.on('melody', function(data) {
+      console.log(data);
+      makeMelody(data["card"])
+    });
+
     const urlParams = new URLSearchParams(window.location.search);
     document.body.style.backgroundColor = `rgb(100, 100, 100)`;
     if (urlParams.get('id')){
@@ -93,26 +107,22 @@ function TonePad() {
       }) 
     }
   }
-
-  function makeMelody(){
+ 
+  function makeMelody(card){
     //assuming that n is a string, each element is between 0-9  
 
-    pitches.current["card"] = getPitches()["card"];
-    var newPitches = pitches.current["card"]
-    if (newPitches === undefined){
-      newPitches = "12345"
-    }
-    if (newPitches.length > 0) {
+    if (card.length > 0) {
       melody.current = []
     };
-    for (var i in newPitches.split("")){
+    console.log("here");
+    for (var i in card.split("")){
       var currentChord = chordArrayUp
-      if (parseInt(newPitches[i], 16) > parseInt(newPitches[(i+1)%newPitches.length], 16)){
+      if (parseInt(card[i], 16) > parseInt(card[(i+1)%card.length], 16)){
           currentChord = chordArrayDown
       }
       for (var c in currentChord){
       var note = currentChord[c]
-      var index = (parseInt(newPitches[i], 16) + parseInt(note, 16));
+      var index = (parseInt(card[i], 16) + parseInt(note, 16));
       var shift = index > 15 ? 7 : 0
       index = (index%15).toString(16).toUpperCase()
       melody.current.push(Tone.Frequency(parseInt(pitchDictM[index])+parseInt(shift),"midi").toFrequency())
@@ -133,8 +143,9 @@ function TonePad() {
   }
 
   const song = (time) => {
-    if (beat.current === 0){
-      makeMelody();
+    if (beat.current%8 === 0){
+      // makeMelody();
+      socket.emit("getMelody");
     }
     if (touchRegistered.current){
       sampler.current.triggerAttackRelease(melody.current[beat.current%melody.current.length], decay, time, 0.4);
@@ -150,7 +161,6 @@ function TonePad() {
     
     var rhythm = (parseInt(clientXNorm.current*16)).toString(2);
     while (rhythm.length < 4) rhythm = "0"+rhythm
-    console.log(rhythm)
     var oldRhythm = rhythm
     if (decay > 1){
       rhythm = ""
@@ -173,12 +183,13 @@ function TonePad() {
         rhythm += rhythm
         }
     }
-    console.log(rhythm.length)
     
     var flag = mouseDown.current
     if (rhythm[beat.current] === "0") mouseDown.current = false 
     if (touchRegistered.current) mouseDown.current = true 
-    sendData(clientX.current/window.innerWidth, clientY.current/window.innerHeight, id.current, mouseDown.current, d, f);
+    // sendData(clientX.current/window.innerWidth, clientY.current/window.innerHeight, id.current, mouseDown.current, d, f);
+    socket.emit("postSound",sendDataSocket(clientX.current/window.innerWidth, clientY.current/window.innerHeight, id.current, mouseDown.current, d, f));
+    
     mouseDown.current = flag
     var velocity = Math.sqrt(clientYNorm.current)
     if (rhythm[beat.current] === "1" && mouseDown.current){ 
@@ -189,8 +200,9 @@ function TonePad() {
           colors: [c1,c2,c3]
         })
     }
-    var d = getOtherSounds();
-    generateOtherSounds(d,id.current);
+    // var d = getOtherSounds();
+
+    
 
   };
 
@@ -199,6 +211,8 @@ function TonePad() {
   const handleTouchStart = (e) => {
     touchRegistered.current = true
     mouseDown.current = true
+    var [d,f] = createSound();
+    socket.emit("postSound",sendDataSocket(clientX.current/window.innerWidth, clientY.current/window.innerHeight, id.current, mouseDown.current, d, f));
     if (e.touches != null) {
       clientY.current = Math.abs(e.touches[0].clientY);
       clientX.current = Math.abs(e.touches[0].clientX);
@@ -258,8 +272,8 @@ function TonePad() {
   //---------Handle TOUCH END
   const handleTouchEnd = () => {
     mouseDown.current = false
-    var [d,f] = createSound();
-    sendData(clientX.current/window.innerWidth, clientY.current/window.innerHeight, id.current, mouseDown.current, d,f);
+    // var [d,f] = createSound();
+    // socket.emit("postSound",sendDataSocket(clientX.current/window.innerWidth, clientY.current/window.innerHeight, id.current, mouseDown.current, d, f));
     pad.current.style.boxShadow = "inset 0 0 20px #000000"
   };
 

@@ -1,6 +1,17 @@
 var coords;
 var sounds;
 var pitches = "";
+export function sendDataSocket(x,y,id,mouse,d,f){
+      var data = {
+        "x": x,
+        "y": y,
+        "userId": id,
+        "mouseDown": mouse,
+        "d":d,
+        "f":f
+      }
+      return data
+  }
 export function sendData(x,y,id,mouse,d,f){
     //switch to http://localhost:8080/jovirtual/coords when debugging
     // https://jovirtual-server.herokuapp.com/jovirtual/coords in production

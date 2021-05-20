@@ -3,6 +3,13 @@ var card = {"card":"12345"};
 const express = require('express');
 const app = express();
 var bodyParser = require("body-parser");
+const server = require('http').createServer(app);
+const io = require('socket.io')(server, {
+  cors: {
+    origin: "http://localhost:3000"||"https://jovirtual.herokuapp.com",
+    methods: ["GET", "POST", "HEAD", "OPTIONS", "PUT"]
+  }
+});
 
 app.use(bodyParser.urlencoded({extended:false}));
 app.use(bodyParser.json());
@@ -61,6 +68,30 @@ function postCard(req, res){
   return "Done!"
 }
 
+io.on('connection', client => {
+  console.log("client connected!");
+  io.listeners('connection');
+  client.on('postSound', data => { 
+    var x = data["x"]
+    var y = data["y"]
+    var d = data["d"]
+    var f = data["f"]
+    var id = data["userId"]
+    var mouseDown = data["mouseDown"]
+    db[id] = {x:x,y:y,mouseDown:mouseDown,d:d,f:f}
+    client.emit("db",db) 
+    });
+  client.on('getMelody', () => {
+    client.emit("melody",card)
+  })
+  client.on('disconnect', () => { 
+    console.log("client disconnected!") 
+    console.log(Object.keys(io.sockets.sockets).length);
+    if (Object.keys(io.sockets.sockets).length === 0){
+    console.log("nobody on! Cleaning Server!");
+    db = {};
+    }});
+});
 
-app.listen(port, "0.0.0.0")
 
+server.listen(port,"0.0.0.0");
