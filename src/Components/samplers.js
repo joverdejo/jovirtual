@@ -7,7 +7,7 @@ export const verb1 = new Tone.Reverb({decay:10, wet:0.3});
 export const delay1 = new Tone.FeedbackDelay("8n", 0.7);
 export const decay1 = 0.5;
 export const s1 = new Tone.Sampler({
-    volume: -14,
+    volume: -8,
     urls: {
         A1: "A1.mp3",
         A2: "A2.mp3",
@@ -20,7 +20,7 @@ export const verb2 = new Tone.Reverb({decay:10, wet:0.3});
 export const delay2 = new Tone.FeedbackDelay("4n", 0.7);
 export const decay2 = 0.9;
 export const s2 =  new Tone.Sampler({
-    volume: -20,
+    volume: -12,
     urls: {
         A1: "A1.mp3",
         A2: "A2.mp3",
@@ -33,7 +33,7 @@ export const verb3 = new Tone.Reverb({decay:20, wet:0.95});
 export const delay3 = new Tone.FeedbackDelay("2n", 0.7);
 export const decay3 = 1.5;
 export const s3 =  new Tone.Sampler({
-volume: -14,
+volume: -6,
 urls: {
     A2: "A1.mp3",
     A3: "A2.mp3",

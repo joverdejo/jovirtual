@@ -90,11 +90,8 @@ function TonePad() {
         x: data[other_uid]["x"]*window.innerWidth,
         y: data[other_uid]["y"]*window.innerHeight,
         colors: [otherSamplers[other_uid]["c1"],otherSamplers[other_uid]["c2"],otherSamplers[other_uid]["c3"]]
-      })
-      
-      
+      }) 
     }
-    
   }
 
   function makeMelody(){
