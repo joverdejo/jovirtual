@@ -62,6 +62,18 @@ function TonePad() {
     var choose = Math.round(Math.abs((Math.random() * (samplers.samplersList.length-1))))
     //resets things back to normal for user
     seedrandom(id.current.toString(), { global: true });
+    if (mitID == 1){
+      return samplers.samplersList[0]
+    }
+    if (mitID == 2){
+      return samplers.samplersList[1]
+    }
+    if (mitID == 3){
+      return samplers.samplersList[2]
+    }
+    if (mitID == 4){
+      return samplers.samplersList[3]
+    }
     return samplers.samplersList[choose]
   }
 
