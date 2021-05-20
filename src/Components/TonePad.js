@@ -27,7 +27,7 @@ function TonePad() {
   var beat = useRef(0);
   var pitches = useRef({"card":"ACFABAC"});
   var mouseDown = useRef(false);
-  const melody = useRef([100,200,100,150,300,250]);
+  const melody = useRef([100,200,100,150,700,250]);
   const pitchDictM = {"0":[60-12],"1":[62-12],"2":[64-12],"3":[65-12],"4":[67-12],"5":[69-12],"6":[71-12],"7":[72-12],
                       "8":[74-12],"9":[75-12],"A":[77-12],"B":[79-12],"C":[81-12],"D":[82-12],"E":[84-12],"F":[85-12]}
   const pitchDictC = {"0":[53],"1":[54],"2":[55],"3":[56],"4":[57],"5":[58],"6":[59],"7":[60],
@@ -48,11 +48,11 @@ function TonePad() {
   //runs at start
   useEffect(()=>{
     socket.on('db', function(data) {
-      console.log(data);
+      // console.log(data);
       generateOtherSounds(data,id.current);
     });
     socket.on('melody', function(data) {
-      console.log(data);
+      // console.log(data);
       makeMelody(data["card"])
     });
 
@@ -76,6 +76,18 @@ function TonePad() {
     var choose = Math.round(Math.abs((Math.random() * (samplers.samplersList.length-1))))
     //resets things back to normal for user
     seedrandom(id.current.toString(), { global: true });
+    if (mitID == 1){
+      return samplers.samplersList[0]
+    }
+    if (mitID == 2){
+      return samplers.samplersList[1]
+    }
+    if (mitID == 3){
+      return samplers.samplersList[2]
+    }
+    if (mitID == 4){
+      return samplers.samplersList[3]
+    }
     return samplers.samplersList[choose]
   }
 
@@ -103,7 +115,9 @@ function TonePad() {
       fx({
         x: data[other_uid]["x"]*window.innerWidth,
         y: data[other_uid]["y"]*window.innerHeight,
-        colors: [otherSamplers[other_uid]["c1"],otherSamplers[other_uid]["c2"],otherSamplers[other_uid]["c3"]]
+        colors: [otherSamplers[other_uid]["c1"],otherSamplers[other_uid]["c2"],otherSamplers[other_uid]["c3"]],
+        count: 10,
+        particleTimeout: 700
       }) 
     }
   }
@@ -114,7 +128,7 @@ function TonePad() {
     if (card.length > 0) {
       melody.current = []
     };
-    console.log("here");
+    // console.log("here");
     for (var i in card.split("")){
       var currentChord = chordArrayUp
       if (parseInt(card[i], 16) > parseInt(card[(i+1)%card.length], 16)){
@@ -152,7 +166,8 @@ function TonePad() {
       fx({
         x: clientX.current,
         y: clientY.current,
-        colors: [c1,c2,c3]
+        colors: [c1,c2,c3],
+        count: 8
       })
       touchRegistered.current = false
     }
@@ -183,7 +198,6 @@ function TonePad() {
         rhythm += rhythm
         }
     }
-    
     var flag = mouseDown.current
     if (rhythm[beat.current] === "0") mouseDown.current = false 
     if (touchRegistered.current) mouseDown.current = true 
@@ -197,7 +211,9 @@ function TonePad() {
         fx({
           x: clientX.current,
           y: clientY.current,
-          colors: [c1,c2,c3]
+          colors: [c1,c2,c3],
+          count: 10,
+          particleTimeout: 700
         })
     }
     // var d = getOtherSounds();

@@ -5,6 +5,7 @@ import * as Tone from 'tone';
 export const filter1 = new Tone.Filter(1500, "lowpass");
 export const verb1 = new Tone.Reverb({decay:10, wet:0.3});
 export const delay1 = new Tone.FeedbackDelay("8n", 0.7);
+var panner1 = new Tone.Panner(1);
 export const decay1 = 0.5;
 export const s1 = new Tone.Sampler({
     volume: -8,
@@ -13,7 +14,7 @@ export const s1 = new Tone.Sampler({
         A2: "A2.mp3",
     },
     baseUrl: "https://tonejs.github.io/audio/casio/",
-}).chain(filter1,verb1,delay1, Tone.Master);
+}).chain(filter1,verb1,delay1,panner1, Tone.Master);
 
 export const filter2 = new Tone.Filter(1500, "lowpass");
 export const verb2 = new Tone.Reverb({decay:10, wet:0.3});
@@ -41,5 +42,18 @@ urls: {
 baseUrl: "https://tonejs.github.io/audio/salamander/",
 }).chain(filter3,verb3,delay3, Tone.Master);
 
+export const filter4 = new Tone.Filter(1500, "lowpass");
+export const verb4 = new Tone.Reverb({decay:10, wet:0.3});
+export const delay4 = new Tone.FeedbackDelay("8n", 0.7);
+export const decay4 = 0.5;
+var panner4 = new Tone.Panner(-1);
+export const s4 = new Tone.Sampler({
+    volume: -8,
+    urls: {
+        A1: "A1.mp3",
+        A2: "A2.mp3",
+    },
+    baseUrl: "https://tonejs.github.io/audio/casio/",
+}).chain(filter4,verb4,delay4,panner4, Tone.Master);
 
-export var samplersList = [[filter1,verb1,delay1,s1,decay1],[filter2,verb2,delay2,s2,decay2],[filter3,verb3,delay3,s3,decay3]]
+export var samplersList = [[filter1,verb1,delay1,s1,decay1],[filter2,verb2,delay2,s2,decay2],[filter3,verb3,delay3,s3,decay3],[filter4,verb4,delay4,s4,decay4]]
